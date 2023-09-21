@@ -1,0 +1,49 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(PolygonCollider2D))]
+public class TouchingDirections : MonoBehaviour
+{
+    public ContactFilter2D contactFilter;
+    private PolygonCollider2D polycollider;
+    private Animator animator;
+
+    List<RaycastHit2D> groundHitResults = new();
+    [SerializeField] private float groundDistance = .05f;
+
+    int isGroundedHash;
+
+    [SerializeField]
+    private bool _isGrounded = true;
+    public bool IsGrounded 
+    { 
+        get
+        {
+            return _isGrounded;
+        } 
+        private set
+        {   
+            _isGrounded = value;
+
+            if(animator != null) 
+                animator.SetBool(isGroundedHash, value);
+        }
+    }
+
+    private void Awake()
+    {
+        polycollider = GetComponent<PolygonCollider2D>();
+
+        isGroundedHash = Animator.StringToHash("isGrounded");
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+       IsGrounded = (polycollider.Cast(Vector2.down, contactFilter, groundHitResults, groundDistance)) > 0;
+
+        Debug.Log(IsGrounded);
+    }
+}
